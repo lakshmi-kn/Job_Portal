@@ -1,0 +1,65 @@
+.home-container {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+  }
+  
+  .title {
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .subtitle {
+    font-size: 20px;
+    margin-bottom: 40px;
+    color: #666;
+  }
+  
+  .role-selection {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .role-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  
+  .role-btn.employer {
+    background-color: #4caf50;
+  }
+  
+  .role-btn.jobseeker {
+    background-color: #2196f3;
+  }
+  
+  .role-btn:hover {
+    opacity: 0.9;
+  }
+  
+  .home-container {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  .button-group {
+    margin-top: 30px;
+  }
+  
+  button {
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  

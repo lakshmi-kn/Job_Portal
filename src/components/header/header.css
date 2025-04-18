@@ -1,0 +1,12 @@
+.header {
+    background-color: #282c34;
+    padding: 1rem;
+    color: white;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+  }
+  
