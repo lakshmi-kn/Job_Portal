@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -15,9 +16,12 @@ import EmployerDashboard from './components/dashboard/EmployerDashboard';
 import JobListings from './components/jobs/JobListings';
 import JobPost from './components/jobs/JobPost';
 import Profile from './components/profile/Profile';
+import Companies from './components/companies/Companies';
+import CompanyDetail from './components/companies/CompanyDetail';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
+import PrivateRoute from './components/routing/PrivateRoute';
 
 const theme = createTheme({
   palette: {
@@ -33,6 +37,7 @@ const theme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <AuthProvider>
         <Router>
           <div className="App">
@@ -42,11 +47,41 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/job-seeker-dashboard" element={<JobSeekerDashboard />} />
-                <Route path="/employer-dashboard" element={<EmployerDashboard />} />
                 <Route path="/jobs" element={<JobListings />} />
-                <Route path="/post-job" element={<JobPost />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/companies" element={<Companies />} />
+                <Route path="/companies/:id" element={<CompanyDetail />} />
+                <Route
+                  path="/dashboard/job-seeker"
+                  element={
+                    <PrivateRoute>
+                      <JobSeekerDashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/employer"
+                  element={
+                    <PrivateRoute>
+                      <EmployerDashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute>
+                      <Profile />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/post-job"
+                  element={
+                    <PrivateRoute>
+                      <JobPost />
+                    </PrivateRoute>
+                  }
+                />
               </Routes>
             </main>
             <Footer />

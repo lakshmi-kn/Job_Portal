@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Grid,
@@ -16,154 +17,179 @@ import {
   Chip,
   Avatar,
   Divider,
+  CircularProgress,
+  Alert,
+  IconButton,
 } from '@mui/material';
 import {
-  Work,
-  AttachMoney,
-  LocationOn,
-  CalendarToday,
-  Bookmark,
-  BookmarkBorder,
-  Send,
+  Work as WorkIcon,
+  Bookmark as BookmarkIcon,
+  Visibility as VisibilityIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { getJobSeekerProfile, getApplications, getSavedJobs, unsaveJob } from '../../services/databaseService';
 
 const JobSeekerDashboard = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [applications, setApplications] = useState([]);
+  const [savedJobs, setSavedJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const applications = [
-    {
-      id: 1,
-      jobTitle: 'Senior React Developer',
-      company: 'Tech Corp',
-      location: 'New York, NY',
-      appliedDate: '2024-03-15',
-      status: 'Under Review',
-    },
-    {
-      id: 2,
-      jobTitle: 'Frontend Developer',
-      company: 'Web Solutions',
-      location: 'Remote',
-      appliedDate: '2024-03-10',
-      status: 'Pending',
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [profileData, applicationsData, savedJobsData] = await Promise.all([
+          getJobSeekerProfile(user.id),
+          getApplications(user.id, 'job_seeker'),
+          getSavedJobs(user.id)
+        ]);
+        setProfile(profileData);
+        setApplications(applicationsData);
+        setSavedJobs(savedJobsData);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const savedJobs = [
-    {
-      id: 1,
-      title: 'UI/UX Designer',
-      company: 'Creative Studio',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      salary: '$80,000 - $100,000',
-      postedDate: '2024-03-05',
-    },
-    {
-      id: 2,
-      title: 'Product Manager',
-      company: 'Tech Startup',
-      location: 'Boston, MA',
-      type: 'Full-time',
-      salary: '$100,000 - $130,000',
-      postedDate: '2024-03-08',
-    },
-  ];
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
 
   const handleViewJob = (jobId) => {
     navigate(`/jobs/${jobId}`);
   };
 
-  const handleApply = (jobId) => {
-    navigate(`/jobs/${jobId}`);
+  const handleUnsaveJob = async (jobId) => {
+    try {
+      await unsaveJob(user.id, jobId);
+      setSavedJobs(savedJobs.filter(job => job.job_id !== jobId));
+    } catch (err) {
+      console.error('Error unsaving job:', err);
+      setError('Failed to unsave job');
+    }
   };
 
-  const handleSaveJob = (jobId) => {
-    console.log('Save job:', jobId);
-  };
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Alert severity="error">{error}</Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mb: 3,
-            }}
-          >
-            <Typography variant="h4">Job Seeker Dashboard</Typography>
-            <Button
-              variant="contained"
-              onClick={() => navigate('/jobs')}
-              startIcon={<Work />}
-            >
-              Browse Jobs
-            </Button>
-          </Box>
+          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+            <Typography component="h1" variant="h4" color="primary" gutterBottom>
+              Job Seeker Dashboard
+            </Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={4}>
+                <Card>
+                  <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      Total Applications
+                    </Typography>
+                    <Typography variant="h3">
+                      {applications.length}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Card>
+                  <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      Saved Jobs
+                    </Typography>
+                    <Typography variant="h3">
+                      {savedJobs.length}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Card>
+                  <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      Profile Views
+                    </Typography>
+                    <Typography variant="h3">
+                      {profile?.profile_views || 0}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Paper>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom>
-              Total Applications
-            </Typography>
-            <Typography variant="h3">{applications.length}</Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom>
-              Saved Jobs
-            </Typography>
-            <Typography variant="h3">{savedJobs.length}</Typography>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom>
-              Profile Views
-            </Typography>
-            <Typography variant="h3">24</Typography>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+            <Typography component="h2" variant="h6" color="primary" gutterBottom>
               Recent Applications
             </Typography>
             <List>
               {applications.map((application) => (
-                <ListItem key={application.id}>
+                <ListItem
+                  key={application.id}
+                  divider
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'action.hover',
+                    },
+                  }}
+                >
                   <ListItemText
-                    primary={application.jobTitle}
+                    primary={application.jobs.title}
                     secondary={
                       <>
-                        <Typography component="span" variant="body2">
-                          {application.company} | {application.location}
+                        <Typography component="span" variant="body2" color="text.primary">
+                          {application.jobs.company}
                         </Typography>
-                        <br />
-                        <Typography component="span" variant="body2" color="text.secondary">
-                          Applied: {application.appliedDate}
-                        </Typography>
+                        {` — Applied on ${new Date(application.applied_date).toLocaleDateString()}`}
+                        <Chip
+                          size="small"
+                          label={application.status}
+                          color={
+                            application.status === 'accepted'
+                              ? 'success'
+                              : application.status === 'rejected'
+                              ? 'error'
+                              : 'warning'
+                          }
+                          sx={{ ml: 1 }}
+                        />
                       </>
                     }
                   />
                   <ListItemSecondaryAction>
-                    <Chip
-                      label={application.status}
-                      color={
-                        application.status === 'Pending'
-                          ? 'warning'
-                          : application.status === 'Under Review'
-                          ? 'info'
-                          : 'success'
-                      }
-                    />
+                    <IconButton
+                      edge="end"
+                      aria-label="view"
+                      onClick={() => handleViewJob(application.job_id)}
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
                   </ListItemSecondaryAction>
                 </ListItem>
               ))}
@@ -171,71 +197,52 @@ const JobSeekerDashboard = () => {
           </Paper>
         </Grid>
 
-        <Grid item xs={12}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+            <Typography component="h2" variant="h6" color="primary" gutterBottom>
               Saved Jobs
             </Typography>
-            <Grid container spacing={2}>
-              {savedJobs.map((job) => (
-                <Grid item xs={12} key={job.id}>
-                  <Card>
-                    <CardContent>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
-                        }}
-                      >
-                        <Box>
-                          <Typography variant="h6" gutterBottom>
-                            {job.title}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                            <Chip
-                              icon={<LocationOn />}
-                              label={job.location}
-                              size="small"
-                            />
-                            <Chip
-                              icon={<Work />}
-                              label={job.type}
-                              size="small"
-                            />
-                            <Chip
-                              icon={<AttachMoney />}
-                              label={job.salary}
-                              size="small"
-                            />
-                          </Box>
-                          <Typography variant="body2" color="text.secondary">
-                            Posted: {job.postedDate}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Button
-                            variant="outlined"
-                            startIcon={<Send />}
-                            onClick={() => handleApply(job.id)}
-                            sx={{ mr: 1 }}
-                          >
-                            Apply
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            startIcon={<Bookmark />}
-                            onClick={() => handleSaveJob(job.id)}
-                          >
-                            Remove
-                          </Button>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
+            <List>
+              {savedJobs.map((savedJob) => (
+                <ListItem
+                  key={savedJob.id}
+                  divider
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'action.hover',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={savedJob.jobs.title}
+                    secondary={
+                      <>
+                        <Typography component="span" variant="body2" color="text.primary">
+                          {savedJob.jobs.company}
+                        </Typography>
+                        {` — ${savedJob.jobs.location} • ${savedJob.jobs.type}`}
+                      </>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    <IconButton
+                      edge="end"
+                      aria-label="view"
+                      onClick={() => handleViewJob(savedJob.job_id)}
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => handleUnsaveJob(savedJob.job_id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
               ))}
-            </Grid>
+            </List>
           </Paper>
         </Grid>
       </Grid>

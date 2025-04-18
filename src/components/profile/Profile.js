@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Grid,
@@ -17,6 +18,8 @@ import {
   ListItemIcon,
   IconButton,
   Chip,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -34,6 +37,8 @@ import {
   Star,
   StarBorder,
 } from '@mui/icons-material';
+import { useAuth } from '../../context/AuthContext';
+import { getProfile, updateProfile } from '../../services/databaseService';
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);

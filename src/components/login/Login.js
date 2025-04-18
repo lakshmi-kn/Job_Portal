@@ -16,6 +16,7 @@ import {
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const validationSchema = yup.object({
   email: yup
@@ -32,6 +33,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -42,18 +44,19 @@ const Login = () => {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        // In a real application, you would validate credentials with a backend
-        // For this demo, we'll just simulate a successful login
-        const userData = {
-          email: values.email,
-          name: 'Demo User',
-          role: 'job_seeker', // or 'employer'
-        };
+        setIsLoading(true);
+        setError('');
         
-        login(userData);
+        await login(values.email, values.password);
+        
+        toast.success('Login successful!');
         navigate('/job-seeker-dashboard');
       } catch (err) {
-        setError('Invalid email or password');
+        console.error('Login error:', err);
+        setError(err.message || 'Invalid email or password');
+        toast.error('Login failed. Please check your credentials.');
+      } finally {
+        setIsLoading(false);
       }
     },
   });
@@ -104,6 +107,7 @@ const Login = () => {
               onChange={formik.handleChange}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
+              disabled={isLoading}
             />
             <TextField
               margin="normal"
@@ -118,6 +122,7 @@ const Login = () => {
               onChange={formik.handleChange}
               error={formik.touched.password && Boolean(formik.errors.password)}
               helperText={formik.touched.password && formik.errors.password}
+              disabled={isLoading}
             />
             <FormControlLabel
               control={
@@ -126,6 +131,7 @@ const Login = () => {
                   color="primary"
                   checked={formik.values.rememberMe}
                   onChange={formik.handleChange}
+                  disabled={isLoading}
                 />
               }
               label="Remember me"
@@ -135,8 +141,9 @@ const Login = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
             <Grid container>
               <Grid item xs>
