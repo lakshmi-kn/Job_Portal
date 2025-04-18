@@ -64,13 +64,84 @@ The technology stack was carefully chosen to ensure scalability, maintainability
 
 ## 3. Project Structure
 
-The entire project is maintained inside one main REACT folder. It contains subfolders like node_modules, public, src and two json files – package-lock.json and package.json.
+The project follows a modern React application structure with the following organization:
 
-The node modules folder is a 3rd party document that contains various files that need not be altered in anyway. 
+```
+job-portal/
+├── public/                 # Static files
+├── src/
+│   ├── assets/            # Images, fonts, and other static assets
+│   ├── components/        # Reusable React components
+│   │   ├── auth/         # Authentication related components
+│   │   ├── companies/    # Company listing and detail components
+│   │   ├── dashboard/    # Dashboard components for both user types
+│   │   ├── jobs/         # Job related components
+│   │   ├── navbar/       # Navigation components
+│   │   ├── profile/      # Profile management components
+│   │   └── routing/      # Route protection components
+│   ├── config/           # Configuration files
+│   │   └── supabaseClient.js  # Supabase client configuration
+│   ├── context/          # React Context providers
+│   │   └── AuthContext.js     # Authentication context
+│   ├── services/         # Service layer
+│   │   └── databaseService.js # Supabase database operations
+│   ├── utils/            # Utility functions
+│   ├── App.js            # Main application component
+│   └── index.js          # Application entry point
+├── .env                  # Environment variables
+├── package.json          # Project dependencies
+└── README.md            # Project documentation
+```
 
-The public folder stores static assets like images, fonts, and favicons that don't require processing by the React application. It contains the index.html file which serves as the entry point for the website in a production environment. It typically references the built JavaScript bundle.
+### Key Directories and Files:
 
-The src folder holds the source code for the React components and application logic. For this project, it contains folders like assets which carries images, components which contains source codes for different website components that are used in multiple pages, context folder which contains contexts for certain elements, pages which contain sources for the different webpages, and files like app.js and its CSS, database JSON files, etc.
+1. **Components Directory**
+   - Organized by feature/functionality
+   - Each component has its own directory with related files
+   - Follows a modular approach for better maintainability
+
+2. **Config Directory**
+   - Contains Supabase client configuration
+   - Manages environment variables and API keys
+   - Handles database connection settings
+
+3. **Context Directory**
+   - Manages global state using React Context
+   - Handles authentication state
+   - Provides user information across components
+
+4. **Services Directory**
+   - Contains database service layer
+   - Handles all Supabase operations
+   - Manages data fetching and mutations
+
+5. **Utils Directory**
+   - Contains helper functions
+   - Manages common utilities
+   - Handles data formatting and validation
+
+### Database Integration:
+
+The project uses Supabase as the backend service, providing:
+- Real-time database capabilities
+- Authentication services
+- File storage for resumes and company logos
+- Row Level Security (RLS) for data protection
+
+### Environment Configuration:
+
+The project uses environment variables for configuration:
+- Supabase URL and API keys
+- Other sensitive configuration data
+- Environment-specific settings
+
+This structure promotes:
+- Clean code organization
+- Easy maintenance
+- Scalability
+- Separation of concerns
+- Reusable components
+- Efficient state management
 
 ### Key Components of the Job Portal:
 
@@ -547,96 +618,63 @@ The application schema tracks the entire application process, from initial submi
 
 ## 8. Challenges Faced
 
-Throughout the development of the Job Portal project, we encountered various challenges that tested our technical skills and problem-solving abilities. Each challenge presented an opportunity for learning and growth, ultimately leading to a more robust and user-friendly application.
+During the development of this job portal, several challenges were encountered and overcome. Here's a comprehensive list of the challenges and their solutions:
 
-### 1. State Management
-- **Challenge:**
-  - Complex state interactions between components
-  - Maintaining consistency across the application
-  - Performance issues with large state objects
-  - State persistence across page refreshes
+1. **State Management Complexity**
+   - Challenge: Managing user authentication state, job listings, and application data across multiple components
+   - Solution: Implemented React Context API for global state management and created custom hooks for reusable logic
 
-Managing state in a complex application like ours proved to be one of the most challenging aspects of development. We needed to ensure that data flowed smoothly between components while maintaining performance and user experience.
+2. **Form Validation and Data Integrity**
+   - Challenge: Ensuring data consistency and proper validation across multiple forms
+   - Solution: Created a custom form validation system using React hooks and implemented client-side validation with proper error handling
 
-- **Solution:**
-  - Implemented React Context for global state
-  - Created custom hooks for reusable logic
-  - Used local storage for state persistence
-  - Optimized state updates with useMemo and useCallback
+3. **Responsive Design Implementation**
+   - Challenge: Creating a consistent user experience across different device sizes
+   - Solution: Utilized Material-UI's responsive components and implemented custom breakpoints for optimal display on all devices
 
-Our solution involved a combination of React Context for global state and local state for component-specific data. We also implemented custom hooks to encapsulate complex state logic and make it reusable across the application.
+4. **Real-time Updates**
+   - Challenge: Keeping job listings and application statuses up-to-date
+   - Solution: Implemented Supabase real-time subscriptions for instant updates
 
-### 2. Form Validation
-- **Challenge:**
-  - Complex validation rules for different forms
-  - Real-time validation feedback
-  - Handling file uploads
-  - Cross-field validation
+5. **Search and Filter Functionality**
+   - Challenge: Implementing efficient search and filtering for jobs and companies
+   - Solution: Created optimized search algorithms and implemented debouncing for search inputs
 
-Form validation presented significant challenges, particularly for complex forms like job postings and user profiles. We needed to ensure that all user inputs were valid while providing clear feedback to users.
+6. **File Upload and Storage**
+   - Challenge: Handling resume uploads and company logos
+   - Solution: Integrated Supabase storage with proper file type validation and size limits
 
-- **Solution:**
-  - Implemented Formik for form state management
-  - Used Yup for validation schemas
-  - Created custom validation hooks
-  - Added file upload validation
+7. **User Experience Optimization**
+   - Challenge: Creating an intuitive and efficient user interface
+   - Solution: Implemented loading states, error boundaries, and proper feedback mechanisms
 
-We leveraged Formik and Yup to create robust validation systems that provided real-time feedback to users while maintaining clean and maintainable code.
+8. **Security Implementation**
+   - Challenge: Ensuring secure user authentication and data protection
+   - Solution: Implemented JWT-based authentication and proper role-based access control
 
-### 3. Responsive Design
-- **Challenge:**
-  - Consistent UI across devices
-  - Mobile-first approach
-  - Complex layouts on small screens
-  - Performance on mobile devices
+9. **Performance Optimization**
+   - Challenge: Maintaining fast load times with large datasets
+   - Solution: Implemented pagination, lazy loading, and optimized database queries
 
-Creating a responsive design that works well across all devices was a significant challenge, particularly for complex layouts like the job search interface and dashboards.
+10. **Cross-browser Compatibility**
+    - Challenge: Ensuring consistent functionality across different browsers
+    - Solution: Used polyfills and fallbacks for better browser support
 
-- **Solution:**
-  - Used Material-UI's responsive grid
-  - Implemented mobile-first design
-  - Created custom breakpoints
-  - Optimized images and assets
+11. **Error Handling**
+    - Challenge: Managing and displaying appropriate error messages
+    - Solution: Created a centralized error handling system with user-friendly messages
 
-We adopted a mobile-first approach and leveraged Material-UI's responsive grid system to ensure a consistent experience across all devices. We also optimized images and assets to ensure fast loading times on mobile devices.
-
-### 4. User Experience
-- **Challenge:**
-  - Intuitive navigation
-  - Fast loading times
-  - Clear feedback mechanisms
-  - Accessibility compliance
-
-Creating an intuitive and accessible user experience was a priority throughout the development process. We needed to ensure that users could easily navigate the application and understand the feedback they received.
-
-- **Solution:**
-  - Implemented loading states
-  - Added error boundaries
-  - Used ARIA labels
-  - Optimized performance
-
-We implemented various UX improvements, including loading states, error boundaries, and ARIA labels for accessibility. We also focused on performance optimization to ensure fast loading times and smooth interactions.
-
-### 5. Security
-- **Challenge:**
-  - Secure authentication
-  - Data protection
-  - Input sanitization
-  - Session management
-
-Security was a critical concern throughout the development process. We needed to ensure that user data was protected and that the application was resistant to common security vulnerabilities.
-
-- **Solution:**
-  - Implemented JWT authentication
-  - Added input validation
-  - Used HTTPS
-  - Implemented secure session handling
-
-We implemented various security measures, including JWT authentication, input validation, and secure session handling. We also ensured that all data transmission was encrypted using HTTPS.
+12. **Database Schema Design**
+    - Challenge: Creating an efficient and scalable database structure
+    - Solution: Implemented proper relationships and indexes for optimal performance
 
 ## 9. Conclusion
 
-The Job Portal project has been a significant learning experience and a demonstration of our ability to create a comprehensive web application that addresses real-world needs. Through this project, we've not only developed a functional job search and recruitment platform but also gained valuable experience in modern web development practices.
+Through this project, I was able to properly learn, understand and apply the different concepts studied throughout the course and more. It really helped putting all the topics and ideas into perspective and understand the usage of each concept.
+
+The project has enabled me to create a functioning dynamic Job Portal website with essential functionalities using React.js, Material-UI, and modern web development concepts.
+
+The website properly functions as a Job Search and Recruitment Platform and gives users a good experience of job searching, applying, and managing their profiles using React components and state management.
 
 ### Project Achievements:
 1. **Technical Implementation**
